@@ -39,8 +39,8 @@ export class CategoriaService{
         })
         
         const mensagem = categoria.length > 0
-        ? `Encontramos ${categoria.length} Gêneros(s) contendo '${genero}' no nome.`
-        : `Nenhum gênero encontramos com o nome ${genero}`
+        ? `✅ Encontramos ${categoria.length} Gêneros(s) contendo '${genero}' no nome.`
+        : `⚠️ Nenhum gênero encontrado com o nome ${genero}`
 
         return {mensagem, categoria}
         }

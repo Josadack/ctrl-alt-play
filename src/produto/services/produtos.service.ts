@@ -27,19 +27,25 @@ export class ProdutoService{
         })
 
         if(!produto)
-            throw new HttpException('Produto não encontrado! ⛓️‍💥', HttpStatus.NOT_FOUND)
+            throw new HttpException('⚠️ Produto não encontrado! ⛓️‍💥', HttpStatus.NOT_FOUND)
         
         return produto;
     }
 
     async findByNome(nome: string): Promise<Produto[]>{
-        return this.pordutoReposiroy.find({
+        const results = await this.pordutoReposiroy.find({
             where: {
                 nome: ILike(`%${nome}%`)
             }, 
              relations: {
                 categoria: true}
         })
+
+        if (results.length === 0) {  
+            throw new HttpException(`⚠️ Nenhum resultado encontrado com o ${nome}`, HttpStatus.NOT_FOUND);  // Trate o erro conforme necessário  
+            }  
+        
+        return results;
     }
 
 
@@ -66,10 +72,12 @@ export class ProdutoService{
                 preco: "DESC",  
             }  
         })
+        
     }
 
     async findByIntervalo(n: number, n2: number): Promise<Produto[]>{
-        return this.pordutoReposiroy.find({
+
+        const results = await this.pordutoReposiroy.find({
                where: {
                       preco: Between(n, n2)
                   },
@@ -78,16 +86,28 @@ export class ProdutoService{
                       preco: "ASC",  
                   }
               })
+
+         if (! results.length)  
+                throw new HttpException(`⚠️ Nenhum intervalo encontrado entre ${n} / ${n2}`, HttpStatus.NOT_FOUND);  // Trate o erro conforme necessário  
+             
+
+        return results;
       }
 
     async countProdutosPorCategoria(genero: string): Promise<{ categoria: string; quantidade: number,  }[]> {  
 
-        return this.pordutoReposiroy.createQueryBuilder('produto')  
+        const results = await this.pordutoReposiroy.createQueryBuilder('produto')  
           .innerJoin('produto.categoria', 'categoria')  
           .where('categoria.genero LIKE :genero', { genero: `%${genero}%` })  
           .groupBy('categoria.genero')  
-          .select(['categoria.genero AS categoria', 'COUNT(produto.id) AS Jogo'])  
+          .select(['categoria.genero AS Gênero', 'COUNT(produto.id) AS Quantidade', 'GROUP_CONCAT(produto.nome) AS Jogos'])  
           .getRawMany()  
+
+        if (results.length === 0) {  
+            throw new HttpException(`⚠️ Nenhum resultado encontrado com o ${genero} `, HttpStatus.NOT_FOUND);  // Trate o erro conforme necessário  
+            }  
+        
+        return results;
     }   
 
 
