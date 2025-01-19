@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { Between, DeleteResult, ILike, In, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual, Repository } from "typeorm";
 import { Produto } from "../entities/produtos.entity";
-import { promises } from "dns";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CategoriaService } from "../../categoria/services/categoria.service";
 
@@ -56,27 +55,6 @@ export class ProdutoService{
         })
     }
 
-    async findByIntervalo(n: number, n2: number): Promise<Produto[]>{
-      return this.pordutoReposiroy.find({
-             where: {
-                    preco: Between(n, n2)
-                },
-                relations: {categoria: true},
-                order: {  
-                    preco: "ASC",  
-                }
-            })
-    }
-
-    async countProdutosPorCategoria(genero: string): Promise<{ categoria: string; quantidade: number }[]> {  
-        return this.pordutoReposiroy.createQueryBuilder('produto')  
-          .innerJoin('produto.categoria', 'categoria')  
-          .where('categoria.genero LIKE :genero', { genero: `%${genero}%` })  
-          .groupBy('categoria.genero')  
-          .select(['categoria.genero AS categoria', 'COUNT(produto.id) AS Jogo'])  
-          .getRawMany()  
-    }   
-
 
     async findByPrecoMaior(preco: number): Promise<Produto[]>{
         return this.pordutoReposiroy.find({
@@ -89,6 +67,28 @@ export class ProdutoService{
             }  
         })
     }
+
+    async findByIntervalo(n: number, n2: number): Promise<Produto[]>{
+        return this.pordutoReposiroy.find({
+               where: {
+                      preco: Between(n, n2)
+                  },
+                  relations: {categoria: true},
+                  order: {  
+                      preco: "ASC",  
+                  }
+              })
+      }
+
+    async countProdutosPorCategoria(genero: string): Promise<{ categoria: string; quantidade: number,  }[]> {  
+
+        return this.pordutoReposiroy.createQueryBuilder('produto')  
+          .innerJoin('produto.categoria', 'categoria')  
+          .where('categoria.genero LIKE :genero', { genero: `%${genero}%` })  
+          .groupBy('categoria.genero')  
+          .select(['categoria.genero AS categoria', 'COUNT(produto.id) AS Jogo'])  
+          .getRawMany()  
+    }   
 
 
     async create(produto: Produto): Promise<Produto>{
