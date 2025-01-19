@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { DeleteResult, ILike, In, Repository } from "typeorm";
+import { Between, DeleteResult, ILike, In, Repository } from "typeorm";
 import { Categoria } from "../entities/categoria.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 
@@ -29,6 +29,7 @@ export class CategoriaService{
         return categoria;
     }
 
+
     async findByGenero(genero: string): Promise<{mensagem: string; categoria: Categoria[]}>{
 
            const categoria = await this.categoriaReposiroy.find({
@@ -38,12 +39,13 @@ export class CategoriaService{
         })
         
         const mensagem = categoria.length > 0
-        ? `Encontramos ${categoria.length}  gênero(s) com o nome ${genero}.`
+        ? `Encontramos ${categoria.length} Gêneros(s) contendo '${genero}' no nome.`
         : `Nenhum gênero encontramos com o nome ${genero}`
 
         return {mensagem, categoria}
-    }
+        }
 
+       
 
     async create(categoria: Categoria): Promise<Categoria>{
 

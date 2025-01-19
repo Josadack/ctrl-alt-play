@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseFloatPipe, ParseIntPipe, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseFloatPipe, ParseIntPipe, Post, Put, Query } from "@nestjs/common";
 import { Produto } from "../entities/produtos.entity";
 import { ProdutoService } from "../services/produtos.service";
 
@@ -21,7 +21,7 @@ export class ProdutoController{
         return this.produtoService.findById(id)
     }
 
-    @Get('/nome/:nome')
+    @Get('/jogos/:nome')
     @HttpCode(HttpStatus.OK)
     findByNome(@Param ('nome') nome: string): Promise<Produto[]>{
         return this.produtoService.findByNome(nome)
@@ -40,6 +40,19 @@ export class ProdutoController{
         return this.produtoService.findByPrecoMaior(preco)
     }
 
+    
+    @Get('/preco/:n/:n2')  
+    @HttpCode(HttpStatus.OK)  
+    findByPrecoBetween(@Param('n') n: number, @Param('n2') n2: number ): Promise<Produto[]> {  
+           return this.produtoService.findByIntervalo(n, n2);  
+    }
+
+
+    @Get('/countcategoria/:genero')  
+    @HttpCode(HttpStatus.OK)  
+    countProdutosPorCategoria(@Param('genero') genero: string): Promise<{ categoria: string; quantidade: number }[]> {  
+      return this.produtoService.countProdutosPorCategoria(genero);  
+    }  
 
     @Post()
     @HttpCode(HttpStatus.CREATED)

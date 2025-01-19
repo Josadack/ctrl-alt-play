@@ -25,8 +25,7 @@ export class CategoriaController{
     @HttpCode(HttpStatus.OK)
     findByGenero(@Param ('genero') genero: string): Promise<{mensagem: string; categoria: Categoria[]}>{
         return this.categoriaService.findByGenero(genero)
-    }
-
+    }  
 
     @Post()
     @HttpCode(HttpStatus.CREATED)

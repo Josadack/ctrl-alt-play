@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { DeleteResult, ILike, In, LessThan, MoreThan, Repository } from "typeorm";
+import { Between, DeleteResult, ILike, In, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual, Repository } from "typeorm";
 import { Produto } from "../entities/produtos.entity";
 import { promises } from "dns";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -26,6 +26,7 @@ export class ProdutoService{
                 id
             },  relations: {categoria: true}
         })
+
         if(!produto)
             throw new HttpException('Produto não encontrado! ⛓️‍💥', HttpStatus.NOT_FOUND)
         
@@ -36,7 +37,9 @@ export class ProdutoService{
         return this.pordutoReposiroy.find({
             where: {
                 nome: ILike(`%${nome}%`)
-            },  relations: {categoria: true}
+            }, 
+             relations: {
+                categoria: true}
         })
     }
 
@@ -44,7 +47,7 @@ export class ProdutoService{
     async findByPrecoMenor(preco: number): Promise<Produto[]>{
         return this.pordutoReposiroy.find({
             where: {  
-                preco: LessThan(preco) // filtrar preços menores  
+                preco: LessThanOrEqual(preco) // filtrar preços menores  
             },  
             relations: { categoria: true },  
             order: {  
@@ -53,11 +56,32 @@ export class ProdutoService{
         })
     }
 
+    async findByIntervalo(n: number, n2: number): Promise<Produto[]>{
+      return this.pordutoReposiroy.find({
+             where: {
+                    preco: Between(n, n2)
+                },
+                relations: {categoria: true},
+                order: {  
+                    preco: "ASC",  
+                }
+            })
+    }
+
+    async countProdutosPorCategoria(genero: string): Promise<{ categoria: string; quantidade: number }[]> {  
+        return this.pordutoReposiroy.createQueryBuilder('produto')  
+          .innerJoin('produto.categoria', 'categoria')  
+          .where('categoria.genero LIKE :genero', { genero: `%${genero}%` })  
+          .groupBy('categoria.genero')  
+          .select(['categoria.genero AS categoria', 'COUNT(produto.id) AS Jogo'])  
+          .getRawMany()  
+    }   
+
 
     async findByPrecoMaior(preco: number): Promise<Produto[]>{
         return this.pordutoReposiroy.find({
             where: {  
-                preco: MoreThan(preco) //  filtrar preços maiores  
+                preco: MoreThanOrEqual(preco) //  filtrar preços maiores  
             },  
             relations: { categoria: true },  
             order: {  
