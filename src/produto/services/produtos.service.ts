@@ -15,7 +15,9 @@ export class ProdutoService{
 
     async findAll(): Promise<Produto[]>{
         return this.pordutoReposiroy.find({
-            relations: {categoria: true}
+            relations: {
+                categoria: true,
+                usuario: true}
         })
     }
 
@@ -23,7 +25,9 @@ export class ProdutoService{
         const produto = await this.pordutoReposiroy.findOne({
             where: {
                 id
-            },  relations: {categoria: true}
+            },  relations: {
+                categoria: true,
+                usuario: true}
         })
 
         if(!produto)
@@ -81,7 +85,9 @@ export class ProdutoService{
                where: {
                       preco: Between(n, n2)
                   },
-                  relations: {categoria: true},
+                  relations: {categoria: true,
+                              usuario: true
+                  },
                   order: {  
                       preco: "ASC",  
                   }
